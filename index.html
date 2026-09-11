@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tacklebox</title>
+<meta name="description" content="Tacklebox is a private, offline-first fishing journal for iPhone and Android. Log every catch, keep your personal bests, and read the water.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+  :root {
+    --bg: #0E1A1E;
+    --bg-deep: #0A1417;
+    --surface: #15272D;
+    --inset: #1C343B;
+    --ink: #F3EEE4;
+    --muted: #9BB0B3;
+    --brass: #C9A24B;
+    --brass-soft: #E2C890;
+    --teal: #57B3A6;
+    --teal-deep: #2E6F68;
+    --hairline: rgba(243, 238, 228, 0.10);
+    --hairline-strong: rgba(243, 238, 228, 0.18);
+    --serif: "Spectral", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+    --sans: "Figtree", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    --wrap: 1120px;
+    --radius: 18px;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  a { color: var(--teal); text-decoration: none; }
+  a:hover { text-decoration: underline; text-underline-offset: 3px; }
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--brass-soft); outline-offset: 3px; border-radius: 6px; }
+  img { max-width: 100%; height: auto; display: block; }
+  h1, h2, h3 { font-family: var(--serif); font-weight: 500; line-height: 1.12; margin: 0; text-wrap: balance; }
+  p { margin: 0; }
+
+  .wrap { max-width: var(--wrap); margin: 0 auto; padding: 0 24px; }
+  .eyebrow {
+    font-family: var(--sans);
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--brass);
+  }
+  .lede { color: var(--muted); font-size: 19px; max-width: 34em; }
+
+  /* ---------- nav ---------- */
+  .nav {
+    display: flex; align-items: center; justify-content: space-between; gap: 24px;
+    padding: 22px 0;
+  }
+  .brand { display: flex; align-items: center; gap: 12px; color: var(--ink); font-family: var(--serif); font-size: 24px; font-weight: 500; }
+  .brand:hover { text-decoration: none; }
+  .brand svg { width: 40px; height: 40px; }
+  .nav-links { display: flex; align-items: center; gap: 26px; font-size: 15px; font-weight: 500; }
+  .nav-links a { color: var(--muted); }
+  .nav-links a:hover { color: var(--ink); text-decoration: none; }
+  .nav-cta {
+    color: var(--bg) !important; background: var(--brass);
+    padding: 9px 16px; border-radius: 999px; font-weight: 600;
+  }
+  .nav-cta:hover { background: var(--brass-soft); }
+  @media (max-width: 720px) { .nav-links a:not(.nav-cta) { display: none; } }
+
+  /* ---------- hero ---------- */
+  .hero { position: relative; padding: 48px 0 72px; }
+  .hero-canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+  .hero-grid {
+    position: relative; z-index: 1;
+    display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    gap: 48px; align-items: center;
+  }
+  .hero h1 {
+    font-size: clamp(44px, 6.4vw, 78px);
+    letter-spacing: -0.015em;
+    margin: 14px 0 22px;
+  }
+  .hero h1 em { font-style: italic; color: var(--brass-soft); font-weight: 400; }
+  .hero .lede { margin-bottom: 34px; }
+  .stores { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+  .trust { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 26px; color: var(--muted); font-size: 14px; font-weight: 500; }
+  .trust span { display: inline-flex; align-items: center; gap: 8px; }
+  .trust svg { width: 16px; height: 16px; color: var(--teal); }
+
+  /* store badges */
+  .badge {
+    display: inline-flex; align-items: center; gap: 11px;
+    background: #000; color: #fff;
+    border: 1px solid rgba(243,238,228,0.22);
+    border-radius: 11px; padding: 9px 16px 9px 12px;
+    min-width: 176px; line-height: 1.1;
+    transition: transform .18s ease, border-color .18s ease;
+  }
+  .badge:hover { text-decoration: none; transform: translateY(-2px); border-color: var(--brass-soft); }
+  .badge svg { width: 28px; height: 28px; flex: none; }
+  .badge .badge-text { display: flex; flex-direction: column; }
+  .badge .small { font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; opacity: 0.85; font-weight: 500; }
+  .badge .big { font-family: var(--sans); font-size: 20px; font-weight: 600; letter-spacing: -0.01em; }
+
+  /* phone */
+  .phone-stage { position: relative; display: flex; justify-content: center; }
+  .phone {
+    width: min(320px, 78vw);
+    aspect-ratio: 1320 / 2868;
+    border-radius: 44px;
+    padding: 10px;
+    background: linear-gradient(160deg, #26424a, #0b1518);
+    box-shadow:
+      0 0 0 1px rgba(243,238,228,0.14),
+      0 30px 80px -20px rgba(0,0,0,0.75),
+      0 0 120px -30px rgba(87,179,166,0.35);
+    transform: rotate(-3deg);
+  }
+  .phone img { width: 100%; height: 100%; object-fit: cover; border-radius: 36px; }
+  .pb-float {
+    position: absolute; left: -6px; bottom: 54px;
+    background: var(--surface); border: 1px solid var(--hairline-strong);
+    border-radius: 14px; padding: 12px 16px;
+    box-shadow: 0 18px 40px -16px rgba(0,0,0,0.7);
+    transform: rotate(2deg);
+  }
+  .pb-float .eyebrow { font-size: 10px; letter-spacing: 0.16em; }
+  .pb-float .num { font-family: var(--serif); font-size: 30px; font-weight: 500; line-height: 1.05; margin-top: 2px; font-variant-numeric: tabular-nums; }
+  .pb-float .sp { color: var(--muted); font-size: 13px; }
+  .bite-float {
+    position: absolute; right: -10px; top: 70px;
+    background: var(--surface); border: 1px solid var(--hairline-strong);
+    border-radius: 14px; padding: 10px 14px;
+    display: flex; align-items: center; gap: 10px;
+    box-shadow: 0 18px 40px -16px rgba(0,0,0,0.7);
+    transform: rotate(-2deg);
+    font-size: 13px;
+  }
+  .bite-float .pill { background: var(--teal); color: var(--bg); font-weight: 700; font-size: 10px; letter-spacing: 0.12em; padding: 3px 8px; border-radius: 999px; }
+  .bite-float strong { font-family: var(--serif); font-weight: 500; font-size: 16px; }
+  @media (max-width: 900px) {
+    .hero-grid { grid-template-columns: 1fr; gap: 44px; }
+    .phone-stage { order: 2; }
+    .pb-float { left: 0; }
+    .bite-float { right: 0; }
+  }
+
+  /* ---------- section chrome ---------- */
+  section { padding: 84px 0; }
+  .section-head { max-width: 640px; margin-bottom: 44px; }
+  .section-head h2 { font-size: clamp(32px, 4.2vw, 48px); margin: 12px 0 14px; letter-spacing: -0.01em; }
+  .tideline { height: 1px; background: linear-gradient(90deg, transparent, var(--hairline-strong) 20%, var(--hairline-strong) 80%, transparent); }
+
+  /* ---------- read the water ---------- */
+  .water { background: linear-gradient(180deg, var(--bg) 0%, var(--bg-deep) 100%); }
+  .water-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+  .wcard {
+    background: var(--surface); border: 1px solid var(--hairline);
+    border-radius: var(--radius); padding: 24px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .wcard .glyph { width: 44px; height: 44px; border-radius: 12px; background: var(--inset); display: grid; place-items: center; color: var(--brass-soft); }
+  .wcard .glyph svg { width: 24px; height: 24px; }
+  .wcard h3 { font-size: 24px; }
+  .wcard p { color: var(--muted); font-size: 15.5px; }
+  .wcard .sample {
+    margin-top: auto; border-top: 1px solid var(--hairline); padding-top: 14px;
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums;
+  }
+  .wcard .sample b { color: var(--ink); font-family: var(--serif); font-weight: 500; font-size: 18px; }
+  .wcard .src { font-size: 12px; color: var(--muted); opacity: 0.8; }
+  @media (max-width: 860px) { .water-grid { grid-template-columns: 1fr; } }
+
+  /* ---------- features ---------- */
+  .feat-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px 32px; }
+  .feat h3 { font-size: 23px; margin-bottom: 8px; }
+  .feat .rule { width: 36px; height: 2px; background: var(--brass); margin-bottom: 18px; }
+  .feat p { color: var(--muted); font-size: 15.5px; }
+  @media (max-width: 860px) { .feat-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 560px) { .feat-grid { grid-template-columns: 1fr; } }
+
+  /* ---------- gallery ---------- */
+  .gallery { padding: 72px 0; background: var(--bg-deep); border-top: 1px solid var(--hairline); border-bottom: 1px solid var(--hairline); }
+  .gallery .section-head { margin-bottom: 30px; }
+  .shots {
+    display: flex; gap: 22px; overflow-x: auto; padding: 8px 24px 24px;
+    scroll-snap-type: x mandatory; scrollbar-width: thin; scrollbar-color: var(--inset) transparent;
+    max-width: var(--wrap); margin: 0 auto;
+  }
+  .shot { flex: 0 0 auto; width: 240px; scroll-snap-align: start; }
+  .shot img {
+    border-radius: 26px;
+    box-shadow: 0 0 0 1px rgba(243,238,228,0.12), 0 24px 50px -22px rgba(0,0,0,0.8);
+  }
+  .shot figcaption { margin-top: 12px; font-size: 14px; color: var(--muted); }
+  .shot figcaption b { color: var(--ink); font-weight: 600; display: block; }
+
+  /* ---------- private ---------- */
+  .private-grid { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 56px; align-items: start; }
+  .private h2 { font-size: clamp(32px, 4.2vw, 48px); margin: 12px 0 14px; }
+  .private ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 0; }
+  .private li {
+    display: grid; grid-template-columns: 28px 1fr; gap: 14px; align-items: start;
+    padding: 18px 0; border-top: 1px solid var(--hairline);
+  }
+  .private li:last-child { border-bottom: 1px solid var(--hairline); }
+  .private li svg { width: 22px; height: 22px; color: var(--teal); margin-top: 3px; }
+  .private li b { display: block; font-weight: 600; margin-bottom: 2px; }
+  .private li span { color: var(--muted); font-size: 15.5px; }
+  @media (max-width: 860px) { .private-grid { grid-template-columns: 1fr; gap: 28px; } }
+
+  /* ---------- pricing / download ---------- */
+  .get {
+    background: var(--surface); border: 1px solid var(--hairline-strong); border-radius: 28px;
+    padding: 56px 40px; text-align: center;
+    position: relative; overflow: hidden;
+  }
+  .get::before {
+    content: ""; position: absolute; inset: -40% -20% auto -20%; height: 90%;
+    background: radial-gradient(ellipse at 50% 0%, rgba(201,162,75,0.16), transparent 60%);
+    pointer-events: none;
+  }
+  .get > * { position: relative; }
+  .get h2 { font-size: clamp(32px, 4.6vw, 52px); margin: 12px auto 14px; max-width: 14em; }
+  .get .lede { margin: 0 auto 32px; }
+  .get .stores { justify-content: center; }
+  .get .fine { margin-top: 22px; color: var(--muted); font-size: 14px; }
+
+  /* ---------- footer ---------- */
+  footer { padding: 40px 0 56px; border-top: 1px solid var(--hairline); }
+  .foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 20px 32px; align-items: center; color: var(--muted); font-size: 14px; }
+  .foot-links { display: flex; flex-wrap: wrap; gap: 8px 22px; }
+  .foot-links a { color: var(--muted); }
+  .foot-links a:hover { color: var(--ink); }
+  .signoff { font-family: var(--serif); font-style: italic; color: var(--brass-soft); font-size: 18px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .badge { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="wrap">
+  <nav class="nav">
+    <a class="brand" href="#top" aria-label="Tacklebox home">
+      <svg viewBox="0 0 440 440" aria-hidden="true">
+        <path d="M158,205 L100,160 Q128,205 100,250 Z" fill="#C9A24B"/>
+        <path d="M158,205 Q250,118 344,205 Q250,292 158,205 Z" fill="#C9A24B"/>
+        <path d="M218,150 Q250,110 282,148 Q250,160 218,150 Z" fill="#E2C890"/>
+        <circle cx="306" cy="188" r="9" fill="#0E1A1E"/>
+        <path d="M270,162 Q258,205 270,248" stroke="#0E1A1E" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.55"/>
+        <path d="M120,300 Q222,336 322,300" stroke="#57B3A6" stroke-width="10" fill="none" stroke-linecap="round"/>
+        <path d="M158,326 Q222,350 286,326" stroke="#57B3A6" stroke-width="7" fill="none" stroke-linecap="round" opacity="0.6"/>
+      </svg>
+      Tacklebox
+    </a>
+    <div class="nav-links">
+      <a href="#water">Read the water</a>
+      <a href="#features">Features</a>
+      <a href="#private">Privacy</a>
+      <a href="#get" class="nav-cta">Get the app</a>
+    </div>
+  </nav>
+</header>
+
+<main id="top">
+  <!-- ================= HERO ================= -->
+  <section class="hero">
+    <canvas class="hero-canvas" id="ripples" aria-hidden="true"></canvas>
+    <div class="wrap hero-grid">
+      <div>
+        <p class="eyebrow">A private fishing journal</p>
+        <h1>Your fishing life, <em>kept together.</em></h1>
+        <p class="lede">Log every catch. Keep your personal bests, your sessions and every water you fish. Then read the bank: bite windows, river levels and tides, all in one calm, private place.</p>
+        <div class="stores">
+          <a class="badge" href="https://apps.apple.com/app/tacklebox/id6805520014" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M16.365 1.43c0 1.14-.493 2.27-1.177 3.08-.744.9-1.99 1.57-2.987 1.57-.12 0-.23-.02-.3-.03-.01-.06-.04-.22-.04-.39 0-1.15.572-2.27 1.206-2.98.804-.94 2.142-1.64 3.248-1.68.03.13.05.28.05.43zm4.565 15.71c-.03.07-.463 1.58-1.518 3.12-.945 1.34-1.94 2.71-3.43 2.71-1.517 0-1.9-.88-3.63-.88-1.698 0-2.302.91-3.67.91-1.377 0-2.332-1.26-3.428-2.8-1.287-1.82-2.323-4.63-2.323-7.28 0-4.28 2.797-6.55 5.552-6.55 1.448 0 2.675.95 3.6.95.865 0 2.222-1.01 3.902-1.01.613 0 2.886.06 4.374 2.19-.13.09-2.383 1.37-2.383 4.19 0 3.26 2.854 4.42 2.955 4.45z"/></svg>
+            <span class="badge-text"><span class="small">Download on the</span><span class="big">App Store</span></span>
+          </a>
+          <a class="badge" href="https://play.google.com/store/apps/details?id=uk.co.tacklebox.app" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path fill="#00A0FF" d="M3.6 2.2c-.3.3-.5.8-.5 1.4v16.8c0 .6.2 1.1.5 1.4l.1.1L13.2 12.1v-.2L3.7 2.1l-.1.1z"/>
+              <path fill="#FFD400" d="M16.4 15.3 13.2 12.1v-.2l3.2-3.2.1.1 3.8 2.1c1.1.6 1.1 1.6 0 2.2l-3.8 2.1-.1.1z"/>
+              <path fill="#FF3A44" d="M16.5 15.2 13.2 12 3.6 21.8c.4.4.9.4 1.6.1l11.3-6.7z"/>
+              <path fill="#00F076" d="M16.5 8.8 5.2 2.1c-.7-.4-1.2-.3-1.6.1L13.2 12l3.3-3.2z"/>
+            </svg>
+            <span class="badge-text"><span class="small">Get it on</span><span class="big">Google Play</span></span>
+          </a>
+        </div>
+        <div class="trust">
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>No account, no sign-up</span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>No adverts, no tracking</span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Works offline</span>
+        </div>
+      </div>
+      <div class="phone-stage">
+        <div class="phone"><img src="img/02-vault.png" alt="The Vault screen in Tacklebox showing a featured personal best of 9.87 kg mirror carp, today's bite windows and a personal-best board." width="1320" height="2868"></div>
+        <div class="pb-float" aria-hidden="true">
+          <p class="eyebrow">New personal best</p>
+          <p class="num">9.87 kg</p>
+          <p class="sp">Mirror carp</p>
+        </div>
+        <div class="bite-float" aria-hidden="true">
+          <span class="pill">GOOD</span>
+          <span>Next major <strong>9:30</strong></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="tideline"></div>
+
+  <!-- ================= READ THE WATER ================= -->
+  <section class="water" id="water">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Today on the bank</p>
+        <h2>Read the water before you cast.</h2>
+        <p class="lede">The intelligence anglers actually use, pulled from public sources when you want it and calculated on your phone when you don't.</p>
+      </div>
+      <div class="water-grid">
+        <article class="wcard">
+          <div class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/><path d="M17 3l.7 1.6L19.3 5.3 17.7 6 17 7.6 16.3 6 14.7 5.3 16.3 4.6z"/></svg></div>
+          <h3>Bite windows</h3>
+          <p>Major and minor feeding periods, sunrise and sunset, moon phase and a day rating. Worked out on your device from the date and your location, so it needs no signal.</p>
+          <div class="sample"><span>Major period</span><b>9:30 &ndash; 11:30</b></div>
+          <p class="src">Solunar, calculated locally</p>
+        </article>
+        <article class="wcard">
+          <div class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8c2.5 0 2.5 2 5 2s2.5-2 5-2 2.5 2 5 2 2.5-2 5-2"/><path d="M2 14c2.5 0 2.5 2 5 2s2.5-2 5-2 2.5 2 5 2 2.5-2 5-2"/><path d="M12 3v3"/></svg></div>
+          <h3>River levels</h3>
+          <p>Nearby gauge levels and flow, with a twelve-reading trend so you can see whether the river is rising, dropping or holding.</p>
+          <div class="sample"><span>Gauges within</span><b>25 km</b></div>
+          <p class="src">UK Environment Agency &middot; USGS (US)</p>
+        </article>
+        <article class="wcard">
+          <div class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17c2 0 2-1.5 4-1.5s2 1.5 4 1.5 2-1.5 4-1.5 2 1.5 4 1.5"/><path d="M3 21c2 0 2-1.5 4-1.5s2 1.5 4 1.5 2-1.5 4-1.5 2 1.5 4 1.5"/><path d="M12 3v9"/><path d="m8 8 4 4 4-4"/></svg></div>
+          <h3>Tides &amp; sea</h3>
+          <p>Coastal tide predictions with wave height, period and sea temperature, shown when you're near the coast.</p>
+          <div class="sample"><span>Sea state &amp; tides</span><b>High &middot; Low</b></div>
+          <p class="src">NOAA &middot; WorldTides &middot; Open-Meteo marine</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= FEATURES ================= -->
+  <section id="features">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Your record</p>
+        <h2>Everything a journal should keep.</h2>
+        <p class="lede">No feed, no noise. Just your catches, your waters and your days on the bank, in a place built to be looked back on.</p>
+      </div>
+      <div class="feat-grid">
+        <article class="feat">
+          <div class="rule"></div>
+          <h3>The Vault</h3>
+          <p>Your featured personal best, a PB board per species, and a running tally of fish landed, species caught and waters kept.</p>
+        </article>
+        <article class="feat">
+          <div class="rule"></div>
+          <h3>Log a catch in seconds</h3>
+          <p>Add a photo, pick a species, set a weight. Tap your saved rigs and baits instead of typing. Recent catches get the current weather added for you.</p>
+        </article>
+        <article class="feat">
+          <div class="rule"></div>
+          <h3>Waters &amp; sessions</h3>
+          <p>A private passport for each water with your own swim notes. Start and stop sessions to remember your hours on the bank, with a Live Activity while you fish.</p>
+        </article>
+        <article class="feat">
+          <div class="rule"></div>
+          <h3>Insights</h3>
+          <p>Catches over time, species and water breakdowns, and the rig and bait behind most of your fish. Patterns you can actually act on.</p>
+        </article>
+        <article class="feat">
+          <div class="rule"></div>
+          <h3>Year on the Water</h3>
+          <p>A shareable season summary: fish landed, total weight, biggest fish and hours spent. Plus a Season Book PDF to keep.</p>
+        </article>
+        <article class="feat">
+          <div class="rule"></div>
+          <h3>Fishes anywhere</h3>
+          <p>Metric or imperial, carp, coarse, match, game, sea or predator. Add your own species and water types. Identify a fish from a photo with iNaturalist.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= GALLERY ================= -->
+  <section class="gallery" aria-label="Screenshots">
+    <div class="wrap section-head">
+      <p class="eyebrow">A look inside</p>
+      <h2>Calm, dark, and built for the bank.</h2>
+    </div>
+    <div class="shots">
+      <figure class="shot"><img src="img/02-vault.png" alt="The Vault screen" loading="lazy" width="1320" height="2868"><figcaption><b>The Vault</b>Personal bests and today's bite windows</figcaption></figure>
+      <figure class="shot"><img src="img/03-log-a-catch.png" alt="Log a catch screen" loading="lazy" width="1320" height="2868"><figcaption><b>Log a catch</b>Photo, species, weight, rig and bait</figcaption></figure>
+      <figure class="shot"><img src="img/06-bite-windows.png" alt="Bite windows screen" loading="lazy" width="1320" height="2868"><figcaption><b>Bite windows</b>Feeding periods, sun and moon</figcaption></figure>
+      <figure class="shot"><img src="img/05-waters.png" alt="Waters screen" loading="lazy" width="1320" height="2868"><figcaption><b>Waters</b>A passport for every water you fish</figcaption></figure>
+      <figure class="shot"><img src="img/04-insights.png" alt="Insights screen" loading="lazy" width="1320" height="2868"><figcaption><b>Insights</b>Your season in numbers</figcaption></figure>
+      <figure class="shot"><img src="img/01-welcome.png" alt="Welcome screen" loading="lazy" width="1320" height="2868"><figcaption><b>First run</b>Set your units and disciplines</figcaption></figure>
+    </div>
+  </section>
+
+  <!-- ================= PRIVATE ================= -->
+  <section class="private" id="private">
+    <div class="wrap private-grid">
+      <div>
+        <p class="eyebrow">Private by design</p>
+        <h2>Your swim stays yours.</h2>
+        <p class="lede">Tacklebox has no backend and no analytics. The only data that ever leaves your phone goes to the public weather, river and tide services when you ask for local conditions.</p>
+      </div>
+      <ul>
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <div><b>No account, no login, no social feed</b><span>Open the app and start logging. There's nothing to sign up for.</span></div>
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <div><b>Your precise fishing spots are never stored</b><span>Location is requested at reduced accuracy and used only to fetch conditions.</span></div>
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg>
+          <div><b>Your journal lives on your device</b><span>On iPhone it can sync through your own private iCloud. We run no server and cannot see it.</span></div>
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+          <div><b>Take it with you</b><span>Export JSON records, a checksummed photo backup, or a Season Book PDF whenever you like.</span></div>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================= GET ================= -->
+  <section id="get">
+    <div class="wrap">
+      <div class="get">
+        <p class="eyebrow">iPhone and Android</p>
+        <h2>One-time purchase. No subscription.</h2>
+        <p class="lede">Everything is included: bite windows, river levels, tides, insights, gear performance and photo species ID. Your journal and exports stay yours, always.</p>
+        <div class="stores">
+          <a class="badge" href="https://apps.apple.com/app/tacklebox/id6805520014" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M16.365 1.43c0 1.14-.493 2.27-1.177 3.08-.744.9-1.99 1.57-2.987 1.57-.12 0-.23-.02-.3-.03-.01-.06-.04-.22-.04-.39 0-1.15.572-2.27 1.206-2.98.804-.94 2.142-1.64 3.248-1.68.03.13.05.28.05.43zm4.565 15.71c-.03.07-.463 1.58-1.518 3.12-.945 1.34-1.94 2.71-3.43 2.71-1.517 0-1.9-.88-3.63-.88-1.698 0-2.302.91-3.67.91-1.377 0-2.332-1.26-3.428-2.8-1.287-1.82-2.323-4.63-2.323-7.28 0-4.28 2.797-6.55 5.552-6.55 1.448 0 2.675.95 3.6.95.865 0 2.222-1.01 3.902-1.01.613 0 2.886.06 4.374 2.19-.13.09-2.383 1.37-2.383 4.19 0 3.26 2.854 4.42 2.955 4.45z"/></svg>
+            <span class="badge-text"><span class="small">Download on the</span><span class="big">App Store</span></span>
+          </a>
+          <a class="badge" href="https://play.google.com/store/apps/details?id=uk.co.tacklebox.app" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path fill="#00A0FF" d="M3.6 2.2c-.3.3-.5.8-.5 1.4v16.8c0 .6.2 1.1.5 1.4l.1.1L13.2 12.1v-.2L3.7 2.1l-.1.1z"/>
+              <path fill="#FFD400" d="M16.4 15.3 13.2 12.1v-.2l3.2-3.2.1.1 3.8 2.1c1.1.6 1.1 1.6 0 2.2l-3.8 2.1-.1.1z"/>
+              <path fill="#FF3A44" d="M16.5 15.2 13.2 12 3.6 21.8c.4.4.9.4 1.6.1l11.3-6.7z"/>
+              <path fill="#00F076" d="M16.5 8.8 5.2 2.1c-.7-.4-1.2-.3-1.6.1L13.2 12l3.3-3.2z"/>
+            </svg>
+            <span class="badge-text"><span class="small">Get it on</span><span class="big">Google Play</span></span>
+          </a>
+        </div>
+        <p class="fine">Requires iOS 17 or later on iPhone. Live conditions and photo identification need a connection.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div class="foot-links">
+      <a href="https://apps.apple.com/app/tacklebox/id6805520014" target="_blank" rel="noopener">App Store</a>
+      <a href="https://play.google.com/store/apps/details?id=uk.co.tacklebox.app" target="_blank" rel="noopener">Google Play</a>
+      <a href="https://stumyatt76.github.io/tacklebox-support/" target="_blank" rel="noopener">Support</a>
+      <a href="https://stumyatt76.github.io/tacklebox-support/privacy" target="_blank" rel="noopener">Privacy policy</a>
+      <a href="mailto:support@caddro.co.uk">support@caddro.co.uk</a>
+    </div>
+    <p class="signoff">Tight lines.</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var canvas = document.getElementById('ripples');
+  if (!canvas || !canvas.getContext) return;
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var ctx = canvas.getContext('2d');
+  var W = 0, H = 0, dpr = Math.min(window.devicePixelRatio || 1, 2);
+  var rings = [];
+  function resize() {
+    var r = canvas.getBoundingClientRect();
+    W = r.width; H = r.height;
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  function seed() {
+    rings = [];
+    for (var i = 0; i < 7; i++) rings.push(make(Math.random() * 1));
+  }
+  function make(t) {
+    return { x: W * (0.55 + Math.random() * 0.45), y: H * (0.1 + Math.random() * 0.8), t: t, speed: 0.00012 + Math.random() * 0.0001, max: 140 + Math.random() * 160 };
+  }
+  var last = 0;
+  function draw(now) {
+    var dt = last ? now - last : 16; last = now;
+    ctx.clearRect(0, 0, W, H);
+    for (var i = 0; i < rings.length; i++) {
+      var g = rings[i];
+      g.t += dt * g.speed;
+      if (g.t > 1) { rings[i] = make(0); continue; }
+      var alpha = (1 - g.t) * 0.22 * Math.sin(Math.PI * Math.min(1, g.t * 4));
+      for (var k = 0; k < 3; k++) {
+        var rad = g.t * g.max - k * 18;
+        if (rad <= 0) continue;
+        ctx.beginPath();
+        ctx.ellipse(g.x, g.y, rad, rad * 0.42, 0, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(87,179,166,' + (alpha / (k + 1)).toFixed(3) + ')';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+    }
+    if (!reduce) requestAnimationFrame(draw);
+  }
+  resize(); seed();
+  window.addEventListener('resize', function () { resize(); seed(); if (reduce) draw(16); });
+  if (reduce) { rings.forEach(function (g) { g.t = 0.4; }); draw(16); }
+  else requestAnimationFrame(draw);
+})();
+</script>
+
+</body>
+</html>
